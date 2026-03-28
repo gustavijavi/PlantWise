@@ -1,1 +1,2 @@
-print("Hello World!")
+from model import predict
+
