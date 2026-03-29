@@ -25,18 +25,20 @@ for plantIndex in plantDict:
     plant = plantDict[plantIndex]
 
     for i in range(100):
-    # Random conditions across full range
         temp = random.uniform(30, 110)
         humidity = random.uniform(0, 100)
-        light_val = random.uniform(0, 30000)
         
-        # Calculate how far outside ranges
+        # Map plant light ranges to raw sensor range
+        plant_light_min = 7000 + (plant[5] / 30000) * (65535 - 7000)
+        plant_light_max = 7000 + (plant[6] / 30000) * (65535 - 7000)
+        
+        light_val = random.uniform(7000, 65535)
+        
         temp_off = max(0, plant[1] - temp, temp - plant[2])
         hum_off = max(0, plant[3] - humidity, humidity - plant[4])
-        light_off = max(0, plant[5] - light_val, light_val - plant[6])
+        light_off = max(0, plant_light_min - light_val, light_val - plant_light_max)
         
-        # Gentler penalty curve
-        score = max(0, min(90, 90 - (temp_off * 1) - (hum_off * 0.8) - (light_off * 0.003)))
+        score = max(0, min(90, 90 - (temp_off * 1.5) - (hum_off * 1.2) - (light_off * 0.001)))
         
         X.append([plantIndex, temp, humidity, light_val])
         y.append(score)
@@ -73,7 +75,7 @@ def tree_to_python(tree, feature_names):
 
 python_code = tree_to_python(clf, ['plant', 'temp', 'humidity', 'light'])
 
-with open('model.py', 'w') as f:
+with open('src/model.py', 'w') as f:
     f.write(python_code)
 
 print("Model exported to model.py")
