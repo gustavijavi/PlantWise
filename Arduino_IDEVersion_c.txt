@@ -1,0 +1,172 @@
+/*
+  LiquidCrystal Library - Hello World
+
+ Demonstrates the use a 16x2 LCD display.  The LiquidCrystal
+ library works with all LCD displays that are compatible with the
+ Hitachi HD44780 driver. There are many of them out there, and you
+ can usually tell them by the 16-pin interface.
+
+ This sketch prints "Hello World!" to the LCD
+ and shows the time.
+
+  The circuit:
+ * LCD RS pin to digital pin 12
+ * LCD Enable pin to digital pin 11
+ * LCD D4 pin to digital pin 5
+ * LCD D5 pin to digital pin 4
+ * LCD D6 pin to digital pin 3
+ * LCD D7 pin to digital pin 2
+ * LCD R/W pin to ground
+ * LCD VSS pin to ground
+ * LCD VCC pin to 5V
+ * 10K resistor:
+ * ends to +5V and ground
+ * wiper to LCD VO pin (pin 3)
+
+ Library originally added 18 Apr 2008
+ by David A. Mellis
+ library modified 5 Jul 2009
+ by Limor Fried (http://www.ladyada.net)
+ example added 9 Jul 2009
+ by Tom Igoe
+ modified 22 Nov 2010
+ by Tom Igoe
+ modified 7 Nov 2016
+ by Arturo Guadalupi
+
+ This example code is in the public domain.
+
+ http://www.arduino.cc/en/Tutorial/LiquidCrystalHelloWorld
+
+*/
+
+// include the library code:
+#pragma once
+#include <LiquidCrystal.h>
+#include <DHT.h>
+#define DHTTYPE DHT11
+
+#define LEDR 6
+#define LEDG 7
+#define LEDB 13
+
+#include "classes.h"
+
+// initialize the library by associating any needed LCD interface pin
+// with the arduino pin number it is connected to
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+DHT dht(8, DHTTYPE);
+
+
+// LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+void setup()
+{
+    lcd.begin(16, 2);
+    //https://ammonshepherd.github.io/arduino-tuts/temp-sensor-lcd-display/
+    dht.begin();
+    //LED 7G, 6R, B13
+      pinMode(LEDR, OUTPUT);
+      pinMode(LEDG, OUTPUT);
+      pinMode(LEDB, OUTPUT);
+      //photresitor
+      //https://www.tinkercad.com/things/3bAgvlGV9Ch/editel?lessonid=E05RHTOJI4U818T&projectid=OXQL7IEL26F9H0U&collectionid=undefined&title=Photoresistor%20(Analog%20Input)#/lesson-viewer
+
+        pinMode(A0, INPUT);
+        Serial.begin(9600);
+        // pinMode(9, OUTPUT);
+
+}
+
+//get & display frunc
+float get(){
+  //humid & temp:
+    float h=dht.readHumidity();
+    float t=dht.readTemperature();
+     t=t*1.8;
+     t=t+32;
+  //photoresitor
+     float light=analogRead(A0);
+    return t,h,light;
+}
+
+void loop() {
+  Plant a("flower",20,40); //plant object
+
+  //humid & temp:
+    float h=dht.readHumidity();
+    float t=dht.readTemperature();
+     t=t*1.8;
+     t=t+32;
+  //photoresitor
+     float light=analogRead(A0);
+  //lcd screen
+    lcd.setCursor(0,0);
+  	lcd.print(a.getname());
+
+    lcd.setCursor(1,1);
+  	lcd.print("H:");
+  	lcd.print(h);
+    lcd.print("%");
+
+    lcd.print(" ");
+    lcd.print("T:");
+    lcd.print(t); //in f
+    
+    //checks the ratio between humid and temp
+    if(h/a.gethum()>=0.8 and t/a.gettemp()>=0.8){//green
+        analogWrite(LEDR, 0);
+      analogWrite(LEDG, 255);
+      analogWrite(LEDB, 0);
+    }
+    else if (0.79<=h/a.gethum()<=0.5 and 0.79<=t/a.gettemp()<=0.5){//yellow
+      analogWrite(LEDR, 0);
+      analogWrite(LEDG, 0);
+      analogWrite(LEDB, 255);
+    }
+    else{//red
+      analogWrite(LEDR, 255);
+      analogWrite(LEDG, 0);
+      analogWrite(LEDB, 0);
+       }
+       
+    delay(1000); //break  
+};
+
+
+
+//classes.h file
+#pragma once
+#include <LiquidCrystal.h>
+#include <Vector.h>
+
+// #include <string>
+using namespace std;
+
+class Plant {
+    String name;
+    double humdity;
+    double temp;
+public:
+    //parameterized constcutor
+    Plant(String n, double h, double t): name(n),humdity(h), temp(t){}
+    //getters
+    String getname(){return name;}
+    double gethum(){return humdity;}
+    double gettemp(){return temp;}
+};
+
+class Garden {
+    Vector<Plant*> collection;
+public:
+    Vector<Plant*> getcollection(){return collection;}
+
+    void add(Plant& a) {
+        collection.push_back(&a);
+    }
+
+};
+
+
+
+
