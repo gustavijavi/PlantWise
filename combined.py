@@ -2489,19 +2489,6 @@ def set_led(r, g, b):
     led_green.value = g
     led_blue.value = b
 
-# while True:
-#     try:
-#         temp, humid, light=get()
-
-#     except RuntimeError as e:
-#         # Reading a sensor is guaranteed to fail once in a while, retry
-#         print(f"Reading error: {e.args[0]}")
-#         time.sleep(2)  # Wait at least 2 seconds between readings
-#         continue
-
-#     time.sleep(2)  # Wait at least 2 seconds between readingsfrom model import predict
-
-
 plantDict = {
     0: "Aeonium",
     1: "African Mask Plant",
