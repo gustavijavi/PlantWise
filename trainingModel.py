@@ -24,28 +24,21 @@ for plantIndex in plantDict:
 
     plant = plantDict[plantIndex]
 
-    for i in range(30):
-        temp = random.uniform(plant[1], plant[2])
-        humidity = random.uniform(plant[3], plant[4])
-        light = random.uniform(plant[5], plant[6])
-        score = random.uniform(80, 100)
-        X.append([plantIndex, temp, humidity, light])
-        y.append(score)
-
-    for i in range(20):
-        temp = random.uniform(plant[1] - 15, plant[2] + 15)
-        humidity = random.uniform(plant[3] - 15, plant[4] + 15)
-        light = random.uniform(plant[5] * 0.5, plant[6] * 1.5)
-        score = random.uniform(40, 70)
-        X.append([plantIndex, temp, humidity, light])
-        y.append(score)
-
-    for i in range(20):
-        temp = random.uniform(plant[1] - 30, plant[2] + 30)
+    for i in range(100):
+    # Random conditions across full range
+        temp = random.uniform(30, 110)
         humidity = random.uniform(0, 100)
-        light = random.uniform(0, 30000)
-        score = random.uniform(0, 30)
-        X.append([plantIndex, temp, humidity, light])
+        light_val = random.uniform(0, 30000)
+        
+        # Calculate how far outside ranges
+        temp_off = max(0, plant[1] - temp, temp - plant[2])
+        hum_off = max(0, plant[3] - humidity, humidity - plant[4])
+        light_off = max(0, plant[5] - light_val, light_val - plant[6])
+        
+        # Gentler penalty curve
+        score = max(0, min(90, 90 - (temp_off * 1) - (hum_off * 0.8) - (light_off * 0.003)))
+        
+        X.append([plantIndex, temp, humidity, light_val])
         y.append(score)
 
 

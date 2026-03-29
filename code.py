@@ -4,5 +4,4 @@ import time
 
 while True:
 
-    display("Test", "test")
-    time.sleep(2)
+    set_led(255, 255, 255)
